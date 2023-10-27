@@ -1,13 +1,10 @@
-#Create App for transfer money
-# Import from CSV files, at /account/import
-# List All Account , /accounts
-# GET an account inforamtion, /account<id>
-# transfer funds, at /transfer
+#Create App for transfering fund
 from flask import Flask, jsonify, request, render_template
 import sqlite3
 import csv
 import codecs
 import pandas as pd
+
 
 app = Flask(__name__)
 
@@ -49,25 +46,28 @@ def import_accounts():
 
         filename = file.filename
         #check if the uploaded file is a CSV file
-        if filename.endswith('.csv'):
+        if filename.lower().endswith('.csv'):
             #create a dictionary from the CSV file
             csv_reader = csv.DictReader(codecs.iterdecode(file, 'utf-8'), delimiter=",")
             #append data of each row as dictionary to the accounts list variable
             for row in csv_reader:
                 accounts.append({
-                    "id" : row["ID"],
-                    "name" : row["Name"],
-                    "balance" : row["Balance"]
+                    "id" : row["ID"].strip(),
+                    "name" : row["Name"].strip(),
+                    "balance" : row["Balance"].strip()
                 })
         #check if the uploaded file is an excel file (most excel extentions)
-        elif filename.lower().endswith(('.xls', '.xlsx', '.xlsm', '.xlsb', '.odf', '.ods', '.odt')):
-            #create a dataframe from the EXCEL File
-            df = pd.read_excel(file)
-            df.columns = map(str.lower, df.columns)
-            #store each row of the dataframe as a dictionary  
-            data = df.to_dict(orient='records')
-            #add data to accounts list varaiable
-            accounts.extend(data)
+        elif filename.lower().endswith(('.xlsx', '.xlsm', '.xlsb', '.odf', '.ods', '.odt')):
+            try: 
+                #create a dataframe from the EXCEL File
+                df = pd.read_excel(file, engine="openpyxl")
+                df.columns = map(str.lower, df.columns)
+                #store each row of the dataframe as a dictionary  
+                data = df.to_dict(orient='records')
+                #add data to accounts list varaiable
+                accounts.extend(data)
+            except Exception as e:
+                print("Error Reading excel file:", str(e))
 
     
         #insert accounts data to the database
@@ -84,7 +84,7 @@ def import_accounts():
         
         except sqlite3.Error as e:
             db.rollback()  # Roll back the transaction in case of an error
-            print(e)
+            print("ERROR in Inserting to database:",e, "ID: ", account['id'])
 
         finally:
             db.close()  # close database connection
@@ -146,17 +146,17 @@ def transfer_fund():
     
     #check if credited account with provided ID exists
     if credited_account_bal is None:
-        return jsonify({"message" : f"The account with ID{credited_account_id} does not exist"})
+        return jsonify({"Message" : f"The account with ID{credited_account_id} does not exist"}), 404
     
     # Check if the debited account exists
     cr.execute("SELECT balance FROM accounts WHERE id = ?", (debited_account_id,))
     debited_account_bal = cr.fetchone()
     if debited_account_bal is None:
-        return jsonify({"message": f"Debited account with ID {debited_account_id} does not exist"})
+        return jsonify({"Message": f"Debited account with ID {debited_account_id} does not exist"}), 404
 
     #check if credited account has suffecient balance
     if credited_account_bal[0] < amount:
-        return jsonify({"message" : "Insuffecit balance for the transfer"})
+        return jsonify({"message" : "Insuffecit balance for the transfer"}), 400
 
     #update the credited account balance 
     cr.execute("UPDATE accounts SET balance = round(balance - ?, 2) WHERE id = ?", (amount, credited_account_id,))
