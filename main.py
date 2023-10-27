@@ -29,39 +29,48 @@ def homepage():
 db, cr = db_connection()
 @app.route('/accounts/import', methods=['POST'])
 def import_accounts():
+    #call sqlite db variable and cursor varialbe
     db, cr = db_connection()
     
+    #check if a file is in the request sent
     if 'file' not in request.files:
-        return "no file in request"
+        return jsonify({"message" : "no file in request"}), 404
     
+    #get the file from the request
     file = request.files['file']
 
+    #check if the file exists and has a name
     if file.filename == '':
-        return " no Selected file"
+        return jsonify({"message" : "no Selected File"}), 404
     
     #variable to store accounts data
     accounts = []
     if file:
-        filename = file.filename
-        if filename.endswith('.csv'):
-            
-            csv_reader = csv.DictReader(codecs.iterdecode(file, 'utf-8'), delimiter=",")
 
-            #add data to the accounts list
+        filename = file.filename
+        #check if the uploaded file is a CSV file
+        if filename.endswith('.csv'):
+            #create a dictionary from the CSV file
+            csv_reader = csv.DictReader(codecs.iterdecode(file, 'utf-8'), delimiter=",")
+            #append data of each row as dictionary to the accounts list variable
             for row in csv_reader:
                 accounts.append({
                     "id" : row["ID"],
                     "name" : row["Name"],
                     "balance" : row["Balance"]
                 })
-
+        #check if the uploaded file is an excel file (most excel extentions)
         elif filename.lower().endswith(('.xls', '.xlsx', '.xlsm', '.xlsb', '.odf', '.ods', '.odt')):
+            #create a dataframe from the EXCEL File
             df = pd.read_excel(file)
-            df.columns = map(str.lower, df.columns)  
+            df.columns = map(str.lower, df.columns)
+            #store each row of the dataframe as a dictionary  
             data = df.to_dict(orient='records')
+            #add data to accounts list varaiable
             accounts.extend(data)
-            #add data to the accounts list
 
+    
+        #insert accounts data to the database
         sql_query = "INSERT INTO accounts ('id', 'name', 'balance') values(?,?,?)"
         try:
             # Begin a transaction
@@ -78,44 +87,88 @@ def import_accounts():
             print(e)
 
         finally:
-            db.close()  # Always close the database connection
-        return jsonify(accounts)
+            db.close()  # close database connection
+        return jsonify(accounts), 200
             
 
 
 @app.route("/accounts", methods=["GET"])
 def get_all_accounts():
+    #call db and cursor variables
     db, cr = db_connection()
     if request.method == "GET":
+        #select all accounts data from database
         cr.execute("SELECT * From accounts")
         rows = cr.fetchall()
+        # store the data as dict in accounts variable
         accounts = [
             dict(id = row[0], name = row[1], balance = row[2])
             for row in rows
         ]
+        #close database connection
         db.close()
         if accounts is not None:
-            return jsonify(accounts)
+            return jsonify(accounts), 200
     
 
 
 @app.route("/account/<id>", methods=["GET"])
 def get_account_by_id(id):
+    #call db and cursor variables
     db, cr = db_connection()
     if request.method == "GET":
+        # select all account data with ID
         cr.execute("SELECT * From accounts where id = ?", (id,))
         rows = cr.fetchall()
+        # store the data as dict in account variable
         account = [
             dict(id = row[0], name = row[1], balance = row[2])
             for row in rows
         ]
+        # close db connection
         db.close()
         if account is not None:
-            return jsonify(account)
+            return jsonify(account), 200
 
-# @app.route("/transfer", methods=["POST"])
-# def transfer_fund():
-#     pass
+@app.route("/transfer", methods=["POST"])
+def transfer_fund():
+    #call sqlite db variable and cursor varialbe
+    db, cr = db_connection()
+    #get data 
+    data = request.get_json()
+    credited_account_id = data.get("credited_account_id")
+    debited_account_id = data.get("debited_account_id")
+    amount = float(data.get("amount"))
+
+    #select the balance of the credited account usnig ID
+    cr.execute("SELECT balance FROM accounts where id = ?", (credited_account_id,))
+    credited_account_bal = cr.fetchone()
+    
+    #check if credited account with provided ID exists
+    if credited_account_bal is None:
+        return jsonify({"message" : f"The account with ID{credited_account_id} does not exist"})
+    
+    # Check if the debited account exists
+    cr.execute("SELECT balance FROM accounts WHERE id = ?", (debited_account_id,))
+    debited_account_bal = cr.fetchone()
+    if debited_account_bal is None:
+        return jsonify({"message": f"Debited account with ID {debited_account_id} does not exist"})
+
+    #check if credited account has suffecient balance
+    if credited_account_bal[0] < amount:
+        return jsonify({"message" : "Insuffecit balance for the transfer"})
+
+    #update the credited account balance 
+    cr.execute("UPDATE accounts SET balance = round(balance - ?, 2) WHERE id = ?", (amount, credited_account_id,))
+    #update the Debited account balance    
+    cr.execute("UPDATE accounts SET balance = round(balance + ?, 2) WHERE id = ?", (amount, debited_account_id),)
+    #commit and close connection
+    db.commit()
+    db.close()
+    #return if the process was successfull
+    return jsonify({"Message" : f" A Transfer of amount {amount} was sent to the account with ID '{debited_account_id}' From the account with ID '{credited_account_id}'"}), 200
+
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=9000)
