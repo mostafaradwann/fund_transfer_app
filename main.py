@@ -99,12 +99,19 @@ def get_all_accounts():
     
 
 
-# @app.route("/account/<id>", methods=["GET"])
-# def get_account_by_id(id):
-#     if request.method == "GET":
-#         for account in accounts_list:
-#             if account['id'] == id:
-#                 return jsonify(account)
+@app.route("/account/<id>", methods=["GET"])
+def get_account_by_id(id):
+    db, cr = db_connection()
+    if request.method == "GET":
+        cr.execute("SELECT * From accounts where id = ?", (id,))
+        rows = cr.fetchall()
+        account = [
+            dict(id = row[0], name = row[1], balance = row[2])
+            for row in rows
+        ]
+        db.close()
+        if account is not None:
+            return jsonify(account)
 
 # @app.route("/transfer", methods=["POST"])
 # def transfer_fund():
