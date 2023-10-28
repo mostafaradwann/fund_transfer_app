@@ -18,6 +18,11 @@
             <h3>Show all Accounts</h3>
             <br>
             <p>you can view all the accounts stored in the database</p>
+            <form action="" method="">
+                <div class="input-group-append">
+                    <input type="submit" name="id" value="Search">
+                </div>
+            </form>
         </div>
 
         <div id='vertical-container'>
@@ -27,30 +32,49 @@
                 <h3>Transfer A Fund</h3>
                 <br>
                 <p>you can transfer fund from here</p>
+
+                <form action="" method="">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Enter the Sender account ID">
+                        <input type="text" class="form-control" placeholder="Enter the Reciever account ID">
+                        <input type="text" class="form-control" placeholder="Enter Amount to be Transfered">
+                        <div class="input-group-append">
+                            <input type="submit" name="id" value="Send">
+                        </div>
+                    </div>
+                </form>
             </div>
 
             <!-- third square div -->
             <div id="getbyid" class='vertical'>
-                <h3>Search an account by ID</h3>
+                <h3>Import Users</h3>
                 <br>
-                <p>You can get an account data by Id From here</p>
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="Recipient's username"
-                        aria-label="Recipient's username" aria-describedby="basic-addon2">
-                    <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button">Button</button>
-                    </div>
-                </div>
+                <p>Import accounts data from a CSV or an XLSX file here </p>
+                <br>
+                <form action="/accounts/import" method="post" enctype="multipart/form-data">
+                    <label for="file">Select a CSV or Excel file:</label>
+                    <input type="file" name="file" id="file" accept=".csv, .xlsx, .xlsm, .xlsb, .odf, .ods, .odt"
+                        required>
+                    <br>
+                    <input type="submit" value="Upload">
+                </form>
             </div>
         </div> <!-- end of vertical div -->
 
         <!-- forth square div -->
         <div id="import" class='horizontal'>
-            <h3>Import Users</h3>
+            <h3>Search an account by ID</h3>
             <br>
-            <p>Import accounts data from a CSV or an XLSX file here </p>
-            <br>
-            <input type="file" name="file" id="file">
+            <p>You can get an account data by Id From here</p>
+            <form action="" method="">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Enter the account ID" aria-label="Enter the ID"
+                        aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                        <input type="submit" name="id" value="Search">
+                    </div>
+                </div>
+            </form>
         </div>
 
     </div> <!-- End of second section -->

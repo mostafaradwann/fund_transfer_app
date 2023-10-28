@@ -93,7 +93,7 @@ def import_accounts():
         finally:
             db.close()  # close database connection
         return jsonify(accounts), 200
-            
+
 
 
 @app.route("/accounts", methods=["GET"])
@@ -111,8 +111,10 @@ def get_all_accounts():
         ]
         #close database connection
         db.close()
+        response_format = request.headers.get('Accept')
         if accounts:
-            return jsonify(accounts), 200
+            if response_format == 'application/json':
+                return jsonify(accounts), 200
         else:
             return jsonify({"Message" : "No Accounts available in DB"}), 404
     

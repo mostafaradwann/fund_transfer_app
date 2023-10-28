@@ -8,21 +8,6 @@ import string
 import random
 import json
 
-def random_id():
-    count = 20
-    all_char = string.ascii_letters() + string.digits
-    chars_count = len(all_char)
-    random_id = []
-
-    while count > 0:
-        random_num = random.randint(0,chars_count - 1)
-        random_charchter = all_char[random_num]
-        random_id.append(random_charchter)
-
-        count -= 1
-    
-    random_id = "".join(random_id)
-    return random_id
 
 class TransferAppTest(unittest.TestCase):
 
@@ -32,7 +17,8 @@ class TransferAppTest(unittest.TestCase):
         self.app.testing = True
     
     def test_show_accounts(self):
-        response = self.app.get('/accounts')
+        headers = {'Accept': 'application/json'} 
+        response = self.app.get('/accounts', headers=headers)
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertIsInstance(data, list, "invalid format")

@@ -1,0 +1,12 @@
+{% extends 'main.html' %}
+{% block body%}
+<div class="container">
+    <h1>Import Accounts Result</h1>
+    {% if response_code == 200 %}
+        <p class="success">File uploaded and processed successfully!</p>
+        <p>Returned JSON data:</p>
+        <pre>{{ json_data | tojson(indent=4) }}</pre>
+    {% else %}
+        <p class="error">Error: {{ error_message }}</p>
+    {% endif %}
+{% endblock %}
