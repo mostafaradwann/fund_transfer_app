@@ -89,6 +89,9 @@ def import_accounts():
         except sqlite3.Error as e:
             db.rollback()  # Roll back the transaction in case of an error
             print("ERROR in Inserting to database:",e, "ID: ", account['id'])
+            request_header = request.headers.get('Accept')
+            if request_header == "application/json":
+                return jsonify({"message" : f"ERROR in Inserting to database: {e} ID: ({account['id']}) already exist"})
             return render_template('import_result.html', response_code=400, error_message="File upload failed")
 
         finally:
@@ -165,13 +168,13 @@ def transfer_fund():
     
     #check if credited account with provided ID exists
     if credited_account_bal is None:
-        return jsonify({"Message" : f"The account with ID{credited_account_id} does not exist"}), 404
+        return jsonify({"Message" : f"The account with ID : {credited_account_id} does not exist"}), 404
     
     # Check if the debited account exists
     cr.execute("SELECT balance FROM accounts WHERE id = ?", (debited_account_id,))
     debited_account_bal = cr.fetchone()
     if debited_account_bal is None:
-        return jsonify({"Message": f"Debited account with ID {debited_account_id} does not exist"}), 404
+        return jsonify({"Message": f"Debited account with ID : {debited_account_id} does not exist"}), 404
 
     #check if credited account has suffecient balance
     if credited_account_bal[0] < amount:
@@ -194,6 +197,7 @@ def transfer_fund():
     if request_header == "application/json":
         #return if the process was successfull
         return jsonify({"Message" : f" A Transfer of amount {amount} was sent to the account with ID '{debited_account_id}' From the account with ID '{credited_account_id}'"}), 200
+        
     return render_template("transfer_result.html", credited_account_id=credited_account_id, debited_account_id=debited_account_id, amount=amount, credited_account_bal=credited_account_bal, debited_account_bal=debited_account_bal, credited_new_balance=credited_new_balance, debited_new_balance=debited_new_balance)
 
 
