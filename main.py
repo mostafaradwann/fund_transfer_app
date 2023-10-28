@@ -21,7 +21,10 @@ def db_connection():
 
 @app.route('/')
 def homepage():
-    return render_template("home.html", pagetitle="Home")
+    return render_template(
+        "home.html", pagetitle="Home", 
+        page_head="Transfer App", 
+        page_description="Sending Money is Easier than you think")
 
 db, cr = db_connection()
 @app.route('/accounts/import', methods=['POST'])
@@ -49,6 +52,7 @@ def import_accounts():
         if filename.lower().endswith('.csv'):
             #create a dictionary from the CSV file
             csv_reader = csv.DictReader(codecs.iterdecode(file, 'utf-8'), delimiter=",")
+            
             #append data of each row as dictionary to the accounts list variable
             for row in csv_reader:
                 accounts.append({
@@ -107,8 +111,10 @@ def get_all_accounts():
         ]
         #close database connection
         db.close()
-        if accounts is not None:
+        if accounts:
             return jsonify(accounts), 200
+        else:
+            return jsonify({"Message" : "No Accounts available in DB"}), 404
     
 
 
@@ -127,8 +133,10 @@ def get_account_by_id(id):
         ]
         # close db connection
         db.close()
-        if account is not None:
+        if account:
             return jsonify(account), 200
+        else:
+            return jsonify({"Message" : f"The Account With ID {id} does not exist"}), 404
 
 @app.route("/transfer", methods=["POST"])
 def transfer_fund():

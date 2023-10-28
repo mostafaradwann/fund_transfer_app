@@ -1,4 +1,60 @@
 {% extends 'main.html' %}
 {% block body%}
-    Hello from home page
+<main>
+
+
+    <div id="first-section">
+        <h1 class="page-head"> {{ page_head }}</h1>
+
+        <p class="page-description">{{ page_description }}</p>
+
+    </div>
+
+    <!-- div for all four squares -->
+    <div id="second-section">
+
+        <!-- first square div -->
+        <div id="getallaccounts" class="horizontal">
+            <h3>Show all Accounts</h3>
+            <br>
+            <p>you can view all the accounts stored in the database</p>
+        </div>
+
+        <div id='vertical-container'>
+            <!-- vertical div -->
+            <!-- second square div -->
+            <div id="transfer" class='vertical'>
+                <h3>Transfer A Fund</h3>
+                <br>
+                <p>you can transfer fund from here</p>
+            </div>
+
+            <!-- third square div -->
+            <div id="getbyid" class='vertical'>
+                <h3>Search an account by ID</h3>
+                <br>
+                <p>You can get an account data by Id From here</p>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Recipient's username"
+                        aria-label="Recipient's username" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button">Button</button>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- end of vertical div -->
+
+        <!-- forth square div -->
+        <div id="import" class='horizontal'>
+            <h3>Import Users</h3>
+            <br>
+            <p>Import accounts data from a CSV or an XLSX file here </p>
+            <br>
+            <input type="file" name="file" id="file">
+        </div>
+
+    </div> <!-- End of second section -->
+
+</main>
+
 {% endblock %}

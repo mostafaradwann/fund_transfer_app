@@ -1,0 +1,135 @@
+:root {
+    --text-clr: #797a7c;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    outline: none;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    background: #eee;
+    color: var(--text-clr);
+    font-size: 15px;
+    
+}
+
+main {
+    text-align: center;
+}
+
+.page-head,
+.page-description {
+    text-align: center;
+}
+
+.page-head {
+    font-size: 40px;
+    margin: 20px 0 0;
+    font-weight: 600;
+}
+
+.page-description {
+    font-size: 22px;
+    margin: 5px 0 40px;
+    font-weight: 200;
+}
+
+#first-section {
+    text-align: center;
+    width: 35%;
+    margin: auto;
+}
+
+#second-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 40px;
+}
+
+#second-section .horizontal,
+#second-section .vertical {
+    border-radius: 10px 10px 0 0;
+}
+
+#getallaccounts {
+    border-top: 5px solid hsl(180, 62%, 55%);
+}
+
+#transfer {
+    border-top: 5px solid hsl(0, 78%, 62%);
+}
+
+#getbyid {
+    border-top: 5px solid hsl(34, 97%, 64%);
+}
+
+#import {
+    border-top: 5px solid hsl(212, 86%, 64%);
+}
+
+#second-section .horizontal {
+    background-color: white;
+    width: 300px;
+    height: 200px;
+    padding: 20px 20px 0 20px;
+    margin: 10px 15px 0 15px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+#second-section .vertical {
+    background-color: white;
+    width: 300px;
+    height: 200px;
+    padding: 10px 30px 0 30px;
+    margin: 30px 15px 0 15px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+@media screen and (max-width: 981px) {
+    #second-section {
+        flex-direction: column;
+    }
+
+    #vertical-container {
+        width: 100%;
+    }
+
+    #second-second .vertical,
+    #second-second .horizontal {
+        width: 70%;
+        padding: 20px 20px 0 20px !important;
+        margin: 20px auto;
+        margin-bottom: 20px;
+    }
+
+    #first-section {
+        width: 70%;
+        line-height: 25px;
+    }
+}
+
+.form-input {
+	position: relative;
+	font-family: "Source Sans Pro", sans-serif;
+	font-weight: 600;
+	width: 100%;
+	height: 40px;
+	border: none;
+	padding: 0 10px;
+	box-shadow: none;
+	outline: none;
+	-webkit-transition: all .5s ease;
+	   -moz-transition: all .5s ease;
+	    -ms-transition: all .5s ease;
+	     -o-transition: all .5s ease;
+	        transition: all .5s ease;
+}
+
+.form-input.basic {
+	border: 2px solid rgba(0, 0, 0, .15);
+}

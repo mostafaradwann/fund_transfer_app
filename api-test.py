@@ -101,7 +101,7 @@ class TransferAppTest(unittest.TestCase):
         transfer_data = {
             "credited_account_id": "a59db1b5-0e2a-46e6-add9-97727dc4a841",
             "debited_account_id": "cb1065d8-419f-4e41-bf23-7a221ff17465",
-            "amount": 500
+            "amount": 10
         }
         
         response = self.app.post("/transfer", json=transfer_data)
@@ -113,7 +113,7 @@ class TransferAppTest(unittest.TestCase):
         transfer_data = {
             "credited_account_id" : "cb1065d8-419f-4e41-bf23-7a221ff17465",
             "debited_account_id": "a59db1b5-0e2a-46e6-add9-97727dc4a841",
-            "amount": 3000
+            "amount": 10000
         }
         response = self.app.post('/transfer', json=transfer_data)
         self.assertEqual(response.status_code, 400)
