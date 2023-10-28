@@ -1,0 +1,11 @@
+{% extends 'main.html' %}
+{% block body%}
+<h1>Transfer Details</h1>
+<p>Amount transferred from Account ID: {{ credited_account_id }} to Account ID: {{ debited_account_id }}</p>
+<p>Transfer Amount: ${{ amount }}</p>
+
+<h2>Updated Account Balances</h2>
+<p>Credited Account (ID: {{ credited_account_id }}) Balance Before: ${{credited_account_bal}} Balance After:${{ credited_new_balance }}</p>
+<p>Debited Account (ID: {{ debited_account_id }}) Balance Before: ${{credited_account_bal}} Balance After:${{ debited_new_balance }}</p>
+</body>
+{% endblock %}

@@ -5,7 +5,22 @@
     {% if response_code == 200 %}
         <p class="success">File uploaded and processed successfully!</p>
         <p>Returned JSON data:</p>
-        <pre>{{ json_data | tojson(indent=4) }}</pre>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Balance</th>
+            </tr>
+            {% for data in json_data %}
+            <tr>
+                <td>{{ data.id }}</td>
+                <td>{{ data.name }}</td>
+                <td>{{ data.balance }}</td>
+            </tr>
+            {% endfor %}
+        
+
+        <!-- <pre>{{ json_data | tojson(indent=4) }}</pre> -->
     {% else %}
         <p class="error">Error: {{ error_message }}</p>
     {% endif %}

@@ -71,7 +71,7 @@ class TransferAppTest(unittest.TestCase):
             "debited_account_id": "invalid-id",
             "amount": 500
         }
-        response = self.app.post('/transfer', json=transfer_data)
+        response = self.app.post('/transfer', data=transfer_data)
         self.assertEqual(response.status_code, 404)
 
 
@@ -90,19 +90,24 @@ class TransferAppTest(unittest.TestCase):
             "amount": 10
         }
         
-        response = self.app.post("/transfer", json=transfer_data)
+        response = self.app.post("/transfer", data=transfer_data)
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.data)
-        self.assertIn("Message", data)
+
 
     def test_insufficient_amount(self):
-        transfer_data = {
-            "credited_account_id" : "cb1065d8-419f-4e41-bf23-7a221ff17465",
-            "debited_account_id": "a59db1b5-0e2a-46e6-add9-97727dc4a841",
-            "amount": 10000
-        }
-        response = self.app.post('/transfer', json=transfer_data)
+        credited_id = "cb1065d8-419f-4e41-bf23-7a221ff17465"
+        debited_account_id = "a59db1b5-0e2a-46e6-add9-97727dc4a841"
+        amount = "10000"
+        response = self.app.post('/transfer', data={
+            'credited_account_id': credited_id,
+            'debited_account_id': debited_account_id,
+            'amount': amount
+        })
+        
         self.assertEqual(response.status_code, 400)
+        # Check the response content, assuming it returns a JSON response
+        response_data = response.get_json()
+        self.assertEqual(response_data['message'], "Insufficient balance for the transfer")
 
 
 if __name__ == "__main__":

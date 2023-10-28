@@ -18,7 +18,7 @@
             <h3>Show all Accounts</h3>
             <br>
             <p>you can view all the accounts stored in the database</p>
-            <form action="" method="">
+            <form action="/accounts" method="get">
                 <div class="input-group-append">
                     <input type="submit" name="id" value="Search">
                 </div>
@@ -33,16 +33,17 @@
                 <br>
                 <p>you can transfer fund from here</p>
 
-                <form action="" method="">
+                <form action="/transfer" method="post">
                     <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="Enter the Sender account ID">
-                        <input type="text" class="form-control" placeholder="Enter the Reciever account ID">
-                        <input type="text" class="form-control" placeholder="Enter Amount to be Transfered">
+                        <input type="text" name="credited_account_id" class="form-control" placeholder="Enter the Sender account ID">
+                        <input type="text" name="debited_account_id" class "form-control" placeholder="Enter the Receiver account ID">
+                        <input type="text" name="amount" class="form-control" placeholder="Enter Amount to be Transferred">
                         <div class="input-group-append">
-                            <input type="submit" name="id" value="Send">
+                            <input type="submit" value="Send">
                         </div>
                     </div>
                 </form>
+                
             </div>
 
             <!-- third square div -->
@@ -66,13 +67,14 @@
             <h3>Search an account by ID</h3>
             <br>
             <p>You can get an account data by Id From here</p>
-            <form action="" method="">
+            <form action="/account" method="get">
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="Enter the account ID" aria-label="Enter the ID"
-                        aria-describedby="basic-addon2">
+                    <input type="text" id="accountIdField" name="id" class="form-control" placeholder="Enter the account ID">
                     <div class="input-group-append">
-                        <input type="submit" name="id" value="Search">
+                        <input type="submit" value="Search">
                     </div>
+                </div>
+            </form>
                 </div>
             </form>
         </div>
@@ -82,3 +84,8 @@
 </main>
 
 {% endblock %}
+
+
+
+
+

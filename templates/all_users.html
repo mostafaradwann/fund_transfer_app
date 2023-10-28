@@ -1,0 +1,23 @@
+{% extends 'main.html' %}
+{% block body%}
+<h1>All User Accounts</h1>
+    {% if accounts %}
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Balance</th>
+        </tr>
+        {% for account in accounts %}
+        <tr>
+            <td>{{ account.id }}</td>
+            <td>{{ account.name }}</td>
+            <td>{{ account.balance }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>No accounts available in the database.</p>
+    {% endif %}
+
+    {% endblock %}

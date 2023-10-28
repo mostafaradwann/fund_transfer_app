@@ -89,10 +89,16 @@ def import_accounts():
         except sqlite3.Error as e:
             db.rollback()  # Roll back the transaction in case of an error
             print("ERROR in Inserting to database:",e, "ID: ", account['id'])
+            return render_template('import_result.html', response_code=400, error_message="File upload failed")
 
         finally:
             db.close()  # close database connection
-        return jsonify(accounts), 200
+        request_header = request.headers.get('Accept')
+        if request_header == "application/json":
+            return jsonify(accounts), 200
+
+        return render_template('import_result.html', response_code=200, json_data=accounts)
+
 
 
 
@@ -111,12 +117,16 @@ def get_all_accounts():
         ]
         #close database connection
         db.close()
-        response_format = request.headers.get('Accept')
-        if accounts:
-            if response_format == 'application/json':
+        request_header = request.headers.get('Accept')
+        if request_header == "application/json":
+            if accounts:
                 return jsonify(accounts), 200
-        else:
-            return jsonify({"Message" : "No Accounts available in DB"}), 404
+            else:
+                return jsonify({"Message" : "No Accounts available in DB"}), 404
+        
+        return render_template("all_users.html", accounts=accounts)
+        
+                
     
 
 
@@ -135,6 +145,7 @@ def get_account_by_id(id):
         ]
         # close db connection
         db.close()
+    
         if account:
             return jsonify(account), 200
         else:
@@ -144,11 +155,9 @@ def get_account_by_id(id):
 def transfer_fund():
     #call sqlite db variable and cursor varialbe
     db, cr = db_connection()
-    #get data 
-    data = request.get_json()
-    credited_account_id = data.get("credited_account_id")
-    debited_account_id = data.get("debited_account_id")
-    amount = float(data.get("amount"))
+    credited_account_id = request.form.get("credited_account_id")
+    debited_account_id = request.form.get("debited_account_id")
+    amount = float(request.form.get("amount"))
 
     #select the balance of the credited account usnig ID
     cr.execute("SELECT balance FROM accounts where id = ?", (credited_account_id,))
@@ -166,17 +175,46 @@ def transfer_fund():
 
     #check if credited account has suffecient balance
     if credited_account_bal[0] < amount:
-        return jsonify({"message" : "Insuffecit balance for the transfer"}), 400
+        return jsonify({"message" : "Insufficient balance for the transfer"}), 400
 
     #update the credited account balance 
     cr.execute("UPDATE accounts SET balance = round(balance - ?, 2) WHERE id = ?", (amount, credited_account_id,))
     #update the Debited account balance    
     cr.execute("UPDATE accounts SET balance = round(balance + ?, 2) WHERE id = ?", (amount, debited_account_id),)
+
+    # Fetch the updated balances
+    cr.execute("SELECT balance FROM accounts where id = ?", (credited_account_id,))
+    credited_new_balance = cr.fetchone()[0]
+    cr.execute("SELECT balance FROM accounts WHERE id = ?", (debited_account_id,))
+    debited_new_balance = cr.fetchone()[0]
     #commit and close connection
     db.commit()
     db.close()
-    #return if the process was successfull
-    return jsonify({"Message" : f" A Transfer of amount {amount} was sent to the account with ID '{debited_account_id}' From the account with ID '{credited_account_id}'"}), 200
+    request_header = request.headers.get('Accept')
+    if request_header == "application/json":
+        #return if the process was successfull
+        return jsonify({"Message" : f" A Transfer of amount {amount} was sent to the account with ID '{debited_account_id}' From the account with ID '{credited_account_id}'"}), 200
+    return render_template("transfer_result.html", credited_account_id=credited_account_id, debited_account_id=debited_account_id, amount=amount, credited_account_bal=credited_account_bal, debited_account_bal=debited_account_bal, credited_new_balance=credited_new_balance, debited_new_balance=debited_new_balance)
+
+
+
+@app.route("/account", methods=["GET"])
+def get_account_data_id():
+    account_id = request.args.get('id')
+    #call db and cursor variables
+    db, cr = db_connection()
+    if request.method == "GET":
+        # select all account data with ID
+        cr.execute("SELECT * From accounts where id = ?", (account_id,))
+        rows = cr.fetchall()
+        # store the data as dict in account variable
+        account = [
+            dict(id = row[0], name = row[1], balance = row[2])
+            for row in rows
+        ]
+        # close db connection
+        db.close()
+        return render_template("user_by_id.html", account=account)
 
 
 
